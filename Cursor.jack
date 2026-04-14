@@ -1,0 +1,207 @@
+class Cursor {
+    field int x, y; //location of the Cursor relative to the screen
+    field int gridX, gridY; //location of the Cursor relative to the grid
+    field Array objectInGrid; //keeps track of where object player placed is, relative to a 8x4 grid
+    field Array objectType; //stores the ID of each object placed
+    field int selectedObject; //keeps track of which object the user wants to place
+    field int lastKey; //tracks the last key pressed
+
+    constructor Cursor new() {
+        var int i;
+        let gridX = 0;
+        let gridY = 0;
+        let selectedObject = 0;
+        let objectInGrid = Array.new(32);
+        let objectType = Array.new(32);
+        let i = 0;
+        while (i < 32) {
+            let objectInGrid[i] = 0;
+            let objectType[i] = 0;
+            let i = i + 1;
+        }
+        let lastKey = 0;
+        do draw();
+        return this;
+    }
+
+    //draws Cursor
+    method void draw() {
+        var int location;
+        var int memAddress;
+        var int column;
+        
+        //the Cursor grid location changed to Screen location
+        let x = 1 + (gridX * 48);
+        let y = 2 + (gridY * 48);
+
+        let column = x / 16;
+        let location = (y * 32) + column;
+        let memAddress = 16384 + location;
+        // column 0
+        do Memory.poke(memAddress, 1023);
+        do Memory.poke(memAddress +32, 1023);
+        do Memory.poke(memAddress +64, 3);
+        do Memory.poke(memAddress +96, 3);
+        do Memory.poke(memAddress +128, 3);
+        do Memory.poke(memAddress +160, 3);
+        do Memory.poke(memAddress +192, 3);
+        do Memory.poke(memAddress +224, 3);
+        do Memory.poke(memAddress +256, 3);
+        do Memory.poke(memAddress +288, 3);
+        do Memory.poke(memAddress +320, 3);
+        do Memory.poke(memAddress +1184, 3);
+        do Memory.poke(memAddress +1216, 3);
+        do Memory.poke(memAddress +1248, 3);
+        do Memory.poke(memAddress +1280, 3);
+        do Memory.poke(memAddress +1312, 3);
+        do Memory.poke(memAddress +1344, 3);
+        do Memory.poke(memAddress +1376, 3);
+        do Memory.poke(memAddress +1408, 3);
+        do Memory.poke(memAddress +1440, 1023);
+        do Memory.poke(memAddress +1472, 1023);
+        // column 1
+        // column 2
+        do Memory.poke(memAddress +2, 32752);
+        do Memory.poke(memAddress +34, 32752);
+        do Memory.poke(memAddress +66, 24576);
+        do Memory.poke(memAddress +98, 24576);
+        do Memory.poke(memAddress +130, 24576);
+        do Memory.poke(memAddress +162, 24576);
+        do Memory.poke(memAddress +194, 24576);
+        do Memory.poke(memAddress +226, 24576);
+        do Memory.poke(memAddress +258, 24576);
+        do Memory.poke(memAddress +290, 24576);
+        do Memory.poke(memAddress +322, 24576);
+        do Memory.poke(memAddress +1186, 24576);
+        do Memory.poke(memAddress +1218, 24576);
+        do Memory.poke(memAddress +1250, 24576);
+        do Memory.poke(memAddress +1282, 24576);
+        do Memory.poke(memAddress +1314, 24576);
+        do Memory.poke(memAddress +1346, 24576);
+        do Memory.poke(memAddress +1378, 24576);
+        do Memory.poke(memAddress +1410, 24576);
+        do Memory.poke(memAddress +1442, 32752);
+        do Memory.poke(memAddress +1474, 32752);
+        return;
+    }
+
+    method Array getObjectInGrid() {
+        return objectInGrid;
+    }
+
+    method void dispose() {
+        do Memory.deAlloc(this);
+        return;
+    }
+
+    //places a sprite on current Cursor location when space bar is pressed
+    method void placeSprite(int key) {
+        var PlayerObjects obj;
+        var int index;
+
+        if (key = 32) {       //space bar
+            let index = (gridY * 8) + gridX;
+            if (objectInGrid[index] = 0) {
+                if (selectedObject = 49) {      //1
+                    let obj = PlayerObjects.new(gridX, gridY);
+                    let objectInGrid[(gridY * 8) + gridX] = obj; //places the newly created object in index associated with grid location
+                    let objectType[(gridY * 8) + gridX] = 1; //sets the space in the grid as 1, which represents teto object
+                    //do obj.draw();
+                    //do Sys.wait(200);
+                }
+                if (selectedObject = 50) {      //2
+                    let obj = PlayerObjects.new(gridX, gridY);
+                    let objectInGrid[(gridY * 8) + gridX] = obj;
+                    let objectType[(gridY * 8) + gridX] = 2; //sets the space in the grid as 2, the Mari object
+                }
+            }
+        }
+        return;
+    }
+
+    method void drawObjects() {
+        var int count;
+        var PlayerObjects temp;
+
+        let count = 0;
+        while (count < 32) {
+            let temp = objectInGrid[count];
+
+            //draws the sprites if temp is a PlayerObjects reference 
+            if (~(temp = 0)) {
+                do temp.setName(objectType[count]);     //updates what type of PlayerObjects is in the current grid location
+                do temp.draw();
+            }
+            let count = count + 1;
+        }
+        return;
+    }
+
+    //deletes a sprite from the screen and memory at the Cursor's current location, if there is an object there
+    method void deleteCurrent() {
+        var int index;
+        var PlayerObjects temp;
+
+        let index = (gridY * 8) + gridX;
+        let temp = objectInGrid[index];
+        if (~(temp = 0)) {
+            do Screen.setColor(false);
+            do Screen.drawRectangle(2 + (gridX * 48), 2 + (gridY * 48), 2 + (gridX * 48) + 47, 2 + (gridY * 48) + 47);
+            //do temp.dispose();
+            let objectInGrid[index] = 0;
+            let objectType[index] = 0;
+        }
+        return;
+    }
+
+    method void update() {
+        var int key;
+        var int oldX;
+        var int oldY;
+
+        let oldX = gridX;
+        let oldY = gridY;
+        let key = Keyboard.keyPressed();
+
+        if ((key = 97) & ~(lastKey = 97)) {        //a
+            if (gridX > 0) {
+                let gridX = gridX - 1;
+            }
+        }
+        if ((key = 100) & ~(lastKey = 100)) {        //d
+            if (gridX < 7) {
+                let gridX = gridX + 1;
+            }
+        }
+        if ((key = 119) & ~(lastKey = 119)) {        //w
+            if (gridY > 0) {
+                let gridY = gridY - 1;
+            }
+        }
+        if ((key = 115) & ~(lastKey = 115)) {        //s
+            if (gridY < 3) {
+                let gridY = gridY + 1;
+            }
+        }
+
+        //erases the old cursor's position
+        do Screen.setColor(false);
+        do Screen.drawRectangle(1 + (oldX * 48), 2 + (oldY * 48), 1 + (oldX * 48) + 47, 2 + (oldY * 48) + 47);
+        
+        if ((key = 101) & ~(lastKey = 101)) {      //e
+            do deleteCurrent();
+        }
+        //selecting object to place
+        if (key = 49) {       //1
+            let selectedObject = 49; //teto
+        }
+        if (key = 50) {       //2
+            let selectedObject = 50; //Mari
+        }
+        
+        do placeSprite(key);
+
+        let lastKey = key;
+        return;
+    }
+}

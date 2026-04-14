@@ -1,0 +1,50 @@
+class TDGame {
+    field Cursor cursor;
+    field Enemies enemy;
+    field Array grid;
+    field int time;
+
+    constructor TDGame new(){
+        let cursor = Cursor.new();
+        let enemy = Enemies.new(23, 0, 100, 1);
+        let grid = cursor.getObjectInGrid();
+        let time = 50;
+        return this;
+    }
+
+    //creates the board to play on, leaving room at the bottom to display attacks and information
+    method void drawGrid() {
+        //horizontal lines
+        do Screen.drawLine(0, 0, 384, 0);
+        do Screen.drawLine(0, 48, 384, 48);
+        do Screen.drawLine(0, 96, 384, 96);
+        do Screen.drawLine(0, 144, 384, 144);
+        do Screen.drawLine(0, 192, 384, 192);
+        //vertical lines
+        do Screen.drawLine(0, 0, 0, 192);
+        do Screen.drawLine(48, 0, 48, 192);
+        do Screen.drawLine(96, 0, 96, 192);
+        do Screen.drawLine(144, 0, 144, 192);
+        do Screen.drawLine(192, 0, 192, 192);
+        do Screen.drawLine(240, 0, 240, 192);
+        do Screen.drawLine(288, 0, 288, 192);
+        do Screen.drawLine(336, 0, 336, 192);
+        do Screen.drawLine(384, 0, 384, 192);
+        return;
+    }
+
+
+
+    method void run() {
+        while (true) {
+            do Screen.setColor(true);
+            do drawGrid();
+            do cursor.update();
+            do cursor.draw();
+            do enemy.move(time);
+            do cursor.drawObjects();
+            do Sys.wait(time);
+        }
+        return;
+    }
+}

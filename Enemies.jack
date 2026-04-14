@@ -1,0 +1,107 @@
+class Enemies {
+    field int gridX, gridY; //location of the enemy, where gridX can range from 0-23, and y from 0-3
+                            //gridX will move ahead 16 bits instead of 48 in order to make movement more gradual
+    field int health; //the health of the enemy
+    field int enemyID; //a numerical value for the enemy to determine which type of enemy we want
+                        //1 = basic enemy
+    field int counter; //a counter to count how many times Sys.wait() has been used in TDGame
+
+    constructor Enemies new(int Ax, int Ay, int Ahealth, int ID) {
+        let gridX = Ax;
+        let gridY = Ay;
+        let health = Ahealth;
+        let enemyID = ID;
+        let counter = 0;
+        return this;
+    }
+
+    method void dispose() {
+        do Memory.deAlloc(this);
+        return;
+    }
+
+    //returns the current row the enemy is on to help PlayerObjects detect an enemy
+    //increments of 24 are used since each row for Enemies is divided into 24 sections
+    method int getRow() {
+        return gridY;
+    }
+
+    method void draw() {
+	    var int memAddress;
+        var int location;
+        var int x, y;
+        var int column;
+        let x = 2 + (gridX * 16);
+        let y = 2 + (gridY * 48);
+
+        let column = x / 16;
+        let location = (y * 32) + column;
+        let memAddress = 16384+location;
+        if (enemyID = 1) {
+            // column 0
+            do Memory.poke(memAddress, 960);
+            do Memory.poke(memAddress +32, 2016);
+            do Memory.poke(memAddress +64, 1696);
+            do Memory.poke(memAddress +96, 2016);
+            do Memory.poke(memAddress +128, 2016);
+            do Memory.poke(memAddress +160, 2016);
+            do Memory.poke(memAddress +192, 384);
+            do Memory.poke(memAddress +224, 960);
+            do Memory.poke(memAddress +256, 2016);
+            do Memory.poke(memAddress +288, 3504);
+            do Memory.poke(memAddress +320, 6552);
+            do Memory.poke(memAddress +352, 4488);
+            do Memory.poke(memAddress +384, 14748);
+            do Memory.poke(memAddress +416, 14748);
+            do Memory.poke(memAddress +448, 14748);
+            do Memory.poke(memAddress +480, 960);
+            do Memory.poke(memAddress +512, 1632);
+            do Memory.poke(memAddress +544, 1056);
+            do Memory.poke(memAddress +576, 3120);
+            do Memory.poke(memAddress +608, 2064);
+            do Memory.poke(memAddress +640, 6168);
+            do Memory.poke(memAddress +672, 4104);
+            do Memory.poke(memAddress +704, 12300);
+            do Memory.poke(memAddress +736, 8196);
+            do Memory.poke(memAddress +768, 8196);
+            do Memory.poke(memAddress +800, 8196);
+            do Memory.poke(memAddress +832, -2017);
+            do Memory.poke(memAddress +864, -2017);
+            do Memory.poke(memAddress +896, -2017);
+            do Memory.poke(memAddress +928, -2017);
+            do Memory.poke(memAddress +960, -2017);
+            do Memory.poke(memAddress +992, 28686);
+        }
+        return;
+    }
+
+    method void eraseEnemy() {
+        var int x, y;
+
+        //prevents the program from crashing when it tries to erase an enemy that could be considered off screen
+        if (gridX < 0) {
+            return;
+        }
+        let x = 2 + (gridX * 16);
+        let y = 2 + (gridY * 48);
+        do Screen.setColor(false);
+        do Screen.drawRectangle(x, y, x + 15, y + 47);
+        return;
+    }
+
+    //moves the enemy across the screen
+    method void move(int time) {
+        do eraseEnemy();
+        let counter = counter + time;
+        if (counter = 250) {
+            let counter = 0;
+            let gridX = gridX - 1;
+        }
+        if (gridX < 0) {       //detects if the left edge of the grid has been reached
+                do dispose();
+                return;
+        }
+        do draw();
+        return;
+    }
+}

@@ -1,0 +1,33 @@
+class Bullet {
+    field int x, y; //the x and y coordinates of where the Bullet is
+
+    //contructed using the gridX and gridY of a given PlayerObjects
+    constructor Bullet new(int Ax, int Ay) {
+        let x = (Ax * 48) + 24;
+        let y = (Ay * 48) + 24;
+        return this;
+    }
+
+    method void dispose() {
+        do Memory.deAlloc(this);
+        return;
+    }
+
+    method void draw() {
+        do Screen.setColor(true);
+        do Screen.drawCircle(x, y, 5);
+        return;
+    }
+
+    method void move() {
+        do Screen.setColor(false);
+        do Screen.drawCircle(x, y, 5);     //erase old bullet location
+        let x = x + 10;
+        do draw();
+        do Sys.wait(50);
+        if (x > 384) {      //check to see if the bullet has gone past the right edge of the grid
+            do dispose();
+        }
+        return;
+    }
+}
