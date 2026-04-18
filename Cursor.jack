@@ -1,3 +1,5 @@
+//Keeps track of a cursor to be used on the grid and the Output class cursor to change information as needed
+
 class Cursor {
     field int x, y; //location of the Cursor relative to the screen
     field int gridX, gridY; //location of the Cursor relative to the grid
@@ -5,6 +7,15 @@ class Cursor {
     field Array objectType; //stores the ID of each object placed
     field int selectedObject; //keeps track of which object the user wants to place
     field int lastKey; //tracks the last key pressed
+    field int currency; // keeps track of how much "money" the player has
+    field int score;
+    field int time;
+    field String moneyLabel;
+    field String scoreLabel;
+    field String moneyVal;
+    field String scoreVal;
+    field String tetoDesc;
+    field String mariDesc;
 
     constructor Cursor new() {
         var int i;
@@ -14,12 +25,21 @@ class Cursor {
         let objectInGrid = Array.new(32);
         let objectType = Array.new(32);
         let i = 0;
+        let currency = 4;
+        let score = 0;
         while (i < 32) {
             let objectInGrid[i] = 0;
             let objectType[i] = 0;
             let i = i + 1;
         }
         let lastKey = 0;
+        let time = 10;
+        let moneyLabel = "Money: ";
+        let scoreLabel = "Score: ";
+        let moneyVal = String.new(6);
+        let scoreVal = String.new(6);
+        let tetoDesc = "Shoots bullets at enemies";
+        let mariDesc = "Increments your total money by 1 after some time";
         do draw();
         return this;
     }
@@ -94,6 +114,31 @@ class Cursor {
         return;
     }
 
+    //prints information about score and currency used to place objects
+    method void printBasicInfo() {
+        do Output.moveCursor(18, 0);
+        do Output.printString(moneyLabel);
+        do moneyVal.setInt(currency);
+        do Output.printString(moneyVal);
+        do Output.moveCursor(18, 38);
+        do Output.printString(scoreLabel);
+        do scoreVal.setInt(score);
+        do Output.printString(scoreVal);
+        return;
+    }
+
+    //prints and update any information that is affected by player objects
+    method void printObjInfo(PlayerObjects obj) {
+        do Output.moveCursor(20, 3);
+        if (obj.getNameID() = 1) {
+            do Output.printString(tetoDesc);
+        }
+        if (obj.getNameID() = 2) {
+            do Output.printString(mariDesc);
+        }
+        return;
+    }
+
     //places a sprite on current Cursor location when space bar is pressed
     method void placeSprite(int key) {
         var PlayerObjects obj;
@@ -102,35 +147,50 @@ class Cursor {
         if (key = 32) {       //space bar
             let index = (gridY * 8) + gridX;
             if (objectInGrid[index] = 0) {
-                if (selectedObject = 49) {      //1
-                    let obj = PlayerObjects.new(gridX, gridY);
-                    let objectInGrid[(gridY * 8) + gridX] = obj; //places the newly created object in index associated with grid location
-                    let objectType[(gridY * 8) + gridX] = 1; //sets the space in the grid as 1, which represents teto object
-                    //do obj.draw();
-                    //do Sys.wait(200);
+                if (selectedObject = 49) {      //1, so teto type
+                    if (currency > 3) {        //teto costs 4
+                        let currency = currency - 4;
+                        let obj = PlayerObjects.new(gridX, gridY);
+                        do obj.setName(1);
+                        let objectInGrid[(gridY * 8) + gridX] = obj; //places the newly created object in index associated with grid location
+                        let objectType[(gridY * 8) + gridX] = 1; //sets the space in the grid as 1, which represents teto object
+                    }
                 }
-                if (selectedObject = 50) {      //2
-                    let obj = PlayerObjects.new(gridX, gridY);
-                    let objectInGrid[(gridY * 8) + gridX] = obj;
-                    let objectType[(gridY * 8) + gridX] = 2; //sets the space in the grid as 2, the Mari object
+                if (selectedObject = 50) {      //2, so Mari type
+                    if (currency > 2) {
+                        let currency = currency - 3;
+                        let obj = PlayerObjects.new(gridX, gridY);
+                        do obj.setName(2);
+                        let objectInGrid[(gridY * 8) + gridX] = obj;
+                        let objectType[(gridY * 8) + gridX] = 2; //sets the space in the grid as 2, the Mari object
+                    }
                 }
+            }
+            if (~(obj = 0)) {
+                do printObjInfo(obj);
             }
         }
         return;
     }
 
+    //method used in TDGame.jack file
     method void drawObjects() {
         var int count;
-        var PlayerObjects temp;
+        var PlayerObjects obj;
 
         let count = 0;
         while (count < 32) {
-            let temp = objectInGrid[count];
+            let obj = objectInGrid[count];
 
-            //draws the sprites if temp is a PlayerObjects reference 
-            if (~(temp = 0)) {
-                do temp.setName(objectType[count]);     //updates what type of PlayerObjects is in the current grid location
-                do temp.draw();
+            //draws the sprites if obj is a PlayerObjects reference 
+            if (~(obj = 0)) {
+                do obj.setName(objectType[count]);     //updates what type of PlayerObjects is in the current grid location
+                do obj.draw();
+
+                //update currency if current 
+                if (obj.getNameID() = 2) {       //Mari's increase total currency
+                    let currency = currency + obj.updateCurrency(time);
+                }
             }
             let count = count + 1;
         }
@@ -183,6 +243,9 @@ class Cursor {
                 let gridY = gridY + 1;
             }
         }
+
+        //print information onto the screen
+        do printBasicInfo();
 
         //erases the old cursor's position
         do Screen.setColor(false);

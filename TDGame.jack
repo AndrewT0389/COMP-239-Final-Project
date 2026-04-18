@@ -33,8 +33,6 @@ class TDGame {
         return;
     }
 
-
-
     method void run() {
         while (true) {
             do Screen.setColor(true);
