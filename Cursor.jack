@@ -16,6 +16,8 @@ class Cursor {
     field String scoreVal;
     field String tetoDesc;
     field String mariDesc;
+    field String drPDesc;
+    field String inklingDesc;
 
     constructor Cursor new() {
         var int i;
@@ -25,7 +27,7 @@ class Cursor {
         let objectInGrid = Array.new(32);
         let objectType = Array.new(32);
         let i = 0;
-        let currency = 4;
+        let currency = 3;       //starting currency, enough for Mari (producer) only
         let score = 0;
         while (i < 32) {
             let objectInGrid[i] = 0;
@@ -38,8 +40,10 @@ class Cursor {
         let scoreLabel = "Score: ";
         let moneyVal = String.new(6);
         let scoreVal = String.new(6);
-        let tetoDesc = "Shoots bullets at enemies";
-        let mariDesc = "Increments your total money by 1 after some time";
+        let tetoDesc    = "           Shoots bullets at enemies            ";
+        let mariDesc    = "Increments your total money by 1 after some time";
+        let drPDesc     = "       Charges a powerful attack overtime       ";
+        let inklingDesc = " Slows enemies if on grid long enough, but dies ";
         do draw();
         return this;
     }
@@ -129,12 +133,18 @@ class Cursor {
 
     //prints and update any information that is affected by player objects
     method void printObjInfo(PlayerObjects obj) {
-        do Output.moveCursor(20, 3);
+        do Output.moveCursor(20, 0);
         if (obj.getNameID() = 1) {
             do Output.printString(tetoDesc);
         }
         if (obj.getNameID() = 2) {
             do Output.printString(mariDesc);
+        }
+        if (obj.getNameID() = 3) {
+            do Output.printString(drPDesc);
+        }
+        if (obj.getNameID() = 4) {
+            do Output.printString(inklingDesc);
         }
         return;
     }
@@ -163,6 +173,24 @@ class Cursor {
                         do obj.setName(2);
                         let objectInGrid[(gridY * 8) + gridX] = obj;
                         let objectType[(gridY * 8) + gridX] = 2; //sets the space in the grid as 2, the Mari object
+                    }
+                }
+                if (selectedObject = 51) {     //3, so Dr. P type
+                    if (currency > 9) {
+                        let currency = currency - 10;
+                        let obj = PlayerObjects.new(gridX, gridY);
+                        do obj.setName(3);
+                        let objectInGrid[(gridY * 8) + gridX] = obj;
+                        let objectType[(gridY * 8) + gridX] = 3; //sets the space in the grid as 3, the Dr. P object
+                    }
+                }
+                if (selectedObject = 52) {     //4, so inkling type
+                    if (currency > 24) {
+                        let currency = currency - 25;
+                        let obj = PlayerObjects.new(gridX, gridY);
+                        do obj.setName(4);
+                        let objectInGrid[(gridY * 8) + gridX] = obj;
+                        let objectType[(gridY * 8) + gridX] = 4; //sets the space in the grid as 3, the inkling object
                     }
                 }
             }
@@ -260,6 +288,12 @@ class Cursor {
         }
         if (key = 50) {       //2
             let selectedObject = 50; //Mari
+        }
+        if (key = 51) {       //3
+            let selectedObject = 51; //Dr. P
+        }
+        if (key = 52) {       //4
+            let selectedObject = 52; //inkling
         }
         
         do placeSprite(key);

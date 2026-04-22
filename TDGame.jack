@@ -3,12 +3,14 @@ class TDGame {
     field Enemies enemy;
     field Array grid;
     field int time;
+    field String info;
 
     constructor TDGame new(){
         let cursor = Cursor.new();
         let enemy = Enemies.new(23, 0, 100, 1);
         let grid = cursor.getObjectInGrid();
         let time = 50;
+        let info = "WASD to move, E to erase";
         return this;
     }
 
@@ -34,6 +36,8 @@ class TDGame {
     }
 
     method void run() {
+        do Output.moveCursor(22, 0);
+        do Output.printString(info);
         while (true) {
             do Screen.setColor(true);
             do drawGrid();
