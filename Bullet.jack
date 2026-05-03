@@ -1,10 +1,19 @@
-class Bullet {
-    field int x, y; //the x and y coordinates of where the Bullet is
+/* The Bullet class handles where bullets should be placed and their movement. This class contains
+ * getters that will be used to for the times when bullets collide with enemies.
+*/
 
-    //contructed using the gridX and gridY of a given PlayerObjects
-    constructor Bullet new(int Ax, int Ay) {
-        let x = (Ax * 48) + 24;
-        let y = (Ay * 48) + 24;
+class Bullet {
+    field int x, y;    //x and y coordinates of the bullet
+    field int row;     //which lane (0-3) the bullet is in
+    field int damage;  //how much damage this bullet deals
+    field int radius;  //size of the bullet circle
+
+    constructor Bullet new(int playerGridX, int playerGridY, int Adamage, int Aradius) {
+        let x = (playerGridX * 48) + 46;   //start at the right edge of the player's cell
+        let y = (playerGridY * 48) + 24;   //vertically centered in the cell
+        let row = playerGridY;
+        let damage = Adamage;
+        let radius = Aradius;
         return this;
     }
 
@@ -13,21 +22,36 @@ class Bullet {
         return;
     }
 
+    method int getX() {
+        return x;
+    }
+    method int getRow() {
+        return row;
+    }
+    method int getDamage() {
+        return damage;
+    }
+
     method void draw() {
         do Screen.setColor(true);
-        do Screen.drawCircle(x, y, 5);
+        do Screen.drawCircle(x, y, radius);
         return;
     }
 
-    method void move() {
+    method void erase() {
         do Screen.setColor(false);
-        do Screen.drawCircle(x, y, 5);     //erase old bullet location
-        let x = x + 10;
-        do draw();
-        do Sys.wait(50);
-        if (x > 384) {      //check to see if the bullet has gone past the right edge of the grid
-            do dispose();
-        }
+        do Screen.drawCircle(x, y, radius);
         return;
+    }
+
+    //moves the bullet to the right. Returns true if still on grid, false if past the grid
+    method boolean move() {
+        do erase();
+        let x = x + 10;
+        if (x > 390) {       //edge of grid
+            return false;
+        }
+        do draw();
+        return true;
     }
 }

@@ -1,13 +1,18 @@
+/* The PlayerObjects class holds all the possible "towers" a user can place, conviently held in one
+ * class as they share the same code, and there is no inheritance in jack (initially).
+*/
+
 class PlayerObjects {
-    field int gridX, gridY; //takes in the position of the Cursor on the grid to determine where to place
+    field int gridX, gridY;  //takes in the position of the Cursor on the grid to determine where to place
     field int nameID; //ID name of the type of player object we want to place, represented by numbers
                       //1 = "teto"; 2 = "Mari"; 3 = "Dr. P"; 4 = "inkling"
-    field int currency; //will be used to keep track of how much each object costs (or adds)
-                        //teto's cost = 4
-                        //Mari's cost = 3
-                        //Dr. P's cost = 10
-                        //inkling's cost = 25
-    field int counter;
+    field int currency; /*  will be used to keep track of how much each object costs (or adds)
+                        *   teto's cost = 4
+                        *   Mari's cost = 3
+                        *   Dr. P's cost = 10
+                        *   inkling's cost = 10  */
+    field int counter;       //general purpose counter (timer)
+    field int attackCounter; //used to determine how much time has passed until next attack can be launched
 
     constructor PlayerObjects new(int Ax, int Ay) {
         let gridX = Ax;
@@ -36,13 +41,27 @@ class PlayerObjects {
         return gridY;
     }
 
-    //detects whether an enemy is on the same row as the instance
-    method void detectEnemy(Enemies enemy) {
-        var Bullet bullet;
-        if (gridY = enemy.getRow()) {
-            let bullet = Bullet.new(gridX, gridY);
-        }
+    method int getGridX() {
+        return gridX;
+    }
+
+    //advances the attack timer to determine when towers can shoot
+    method void attack(int time) {
+        let attackCounter = attackCounter + time;
         return;
+    }
+
+    //returns damage if the attack is ready and resets the counter
+    method int fire() {
+        if ((attackCounter > 350) & (nameID = 1)) {      //teto's attack
+            let attackCounter = 0;
+            return 15;
+        }
+        if ((attackCounter > 1500) & (nameID = 3)) {     //Dr. P's attack
+            let attackCounter = 0;
+            return 75;
+        }
+        return 0;
     }
 
     method void draw() {
@@ -143,6 +162,7 @@ class PlayerObjects {
             do Memory.poke(memAddress +1345, 0);
             do Memory.poke(memAddress +1377, 0);
             do Memory.poke(memAddress +1409, 0);
+            return;
         }
         if (nameID = 2) {       //draws the "Mari" sprite
             // column 0
@@ -292,6 +312,7 @@ class PlayerObjects {
             do Memory.poke(memAddress +1442, 0);
             do Memory.poke(memAddress +1474, 0);
             do Memory.poke(memAddress +1506, 0);
+            return;
         }
         if (nameID = 3) {       //draws the "Dr. P" sprite
             // column 0
@@ -441,6 +462,7 @@ class PlayerObjects {
             do Memory.poke(memAddress +1442, 0);
             do Memory.poke(memAddress +1474, 0);
             do Memory.poke(memAddress +1506, 0);
+            return;
         }
         if (nameID = 4) {      //draws the "inkling" sprite
             // column 0
@@ -590,6 +612,7 @@ class PlayerObjects {
             do Memory.poke(memAddress +1442, 0);
             do Memory.poke(memAddress +1474, 0);
             do Memory.poke(memAddress +1506, 0);
+            return;
         }
         return;
     }
@@ -598,9 +621,10 @@ class PlayerObjects {
         return currency;
     }
 
+    //increases currency, meaning it is tied to Mari and should only be used with her
     method int updateCurrency(int time){
         let counter = counter + time;
-        if (counter = 1000) {
+        if (counter > 1100) {
             let counter = 0;
             return 1;
         }
