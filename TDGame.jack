@@ -237,13 +237,6 @@ class TDGame {
         do Output.printString(info);
         do icons.drawTowerPanel();
         while (bool) {
-            //if score >= 31, end game
-            if (cursor.getScore() > 30) {
-                do Output.moveCursor(20, 0);
-                do Output.printString(win);
-                do Sys.halt();
-            }
-
             //handle input and erase old cursor position
             do cursor.update();
             do lastKeyPressed(cursor);
@@ -306,6 +299,13 @@ class TDGame {
             do cursor.draw();
             do cursor.drawBullets();
             do drawGrid();
+
+            //if score >= 31, end game
+            if (cursor.getScore() > 30) {
+                do Output.moveCursor(20, 0);
+                do Output.printString(win);
+                do Sys.halt();
+            }
             do Sys.wait(time);
         }
         return;

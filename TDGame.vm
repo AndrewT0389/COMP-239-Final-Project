@@ -986,24 +986,6 @@ label TDGame_48
     not
     if-goto TDGame_49
     push this 0
-    call Cursor.getScore 1
-    push constant 30
-    gt
-    not
-    if-goto TDGame_51
-    push constant 20
-    push constant 0
-    call Output.moveCursor 2
-    pop temp 0
-    push this 13
-    call Output.printString 1
-    pop temp 0
-    call Sys.halt 0
-    pop temp 0
-    goto TDGame_50
-label TDGame_51
-label TDGame_50
-    push this 0
     call Cursor.update 1
     pop temp 0
     push pointer 0
@@ -1015,12 +997,12 @@ label TDGame_50
     pop this 10
     push constant 0
     pop local 1
-label TDGame_52
+label TDGame_50
     push local 1
     push constant 40
     lt
     not
-    if-goto TDGame_53
+    if-goto TDGame_51
     push local 1
     push this 6
     add
@@ -1032,7 +1014,7 @@ label TDGame_52
     eq
     not
     not
-    if-goto TDGame_55
+    if-goto TDGame_53
     push local 3
     push this 7
     call Enemies.move 2
@@ -1046,15 +1028,15 @@ label TDGame_52
     push local 3
     call Cursor.checkCollisions 2
     pop temp 0
-    goto TDGame_54
-label TDGame_55
-label TDGame_54
+    goto TDGame_52
+label TDGame_53
+label TDGame_52
     push local 1
     push constant 1
     add
     pop local 1
-    goto TDGame_52
-label TDGame_53
+    goto TDGame_50
+label TDGame_51
     push this 0
     call Cursor.moveBullets 1
     pop temp 0
@@ -1062,12 +1044,12 @@ label TDGame_53
     pop local 2
     push constant 0
     pop local 1
-label TDGame_56
+label TDGame_54
     push local 1
     push constant 40
     lt
     not
-    if-goto TDGame_57
+    if-goto TDGame_55
     push local 1
     push this 6
     add
@@ -1079,7 +1061,7 @@ label TDGame_56
     eq
     not
     not
-    if-goto TDGame_59
+    if-goto TDGame_57
     push this 0
     push local 3
     call Cursor.checkBulletsVsEnemy 2
@@ -1094,7 +1076,7 @@ label TDGame_56
     lt
     or
     not
-    if-goto TDGame_61
+    if-goto TDGame_59
     push local 3
     call Enemies.eraseEnemy 1
     pop temp 0
@@ -1109,22 +1091,22 @@ label TDGame_56
     pop pointer 1
     push temp 0
     pop that 0
-    goto TDGame_60
-label TDGame_61
+    goto TDGame_58
+label TDGame_59
     push local 2
     push constant 1
     add
     pop local 2
-label TDGame_60
-    goto TDGame_58
-label TDGame_59
 label TDGame_58
+    goto TDGame_56
+label TDGame_57
+label TDGame_56
     push local 1
     push constant 1
     add
     pop local 1
-    goto TDGame_56
-label TDGame_57
+    goto TDGame_54
+label TDGame_55
     push this 11
     push constant 1
     add
@@ -1138,15 +1120,15 @@ label TDGame_57
     gt
     and
     not
-    if-goto TDGame_63
+    if-goto TDGame_61
     push pointer 0
     call TDGame.spawnEnemy 1
     pop temp 0
     push constant 0
     pop this 11
-    goto TDGame_62
-label TDGame_63
-label TDGame_62
+    goto TDGame_60
+label TDGame_61
+label TDGame_60
     push constant 1
     neg
     call Screen.setColor 1
@@ -1159,12 +1141,12 @@ label TDGame_62
     pop temp 0
     push constant 0
     pop local 1
-label TDGame_64
+label TDGame_62
     push local 1
     push constant 40
     lt
     not
-    if-goto TDGame_65
+    if-goto TDGame_63
     push local 1
     push this 6
     add
@@ -1176,19 +1158,19 @@ label TDGame_64
     eq
     not
     not
-    if-goto TDGame_67
+    if-goto TDGame_65
     push local 3
     call Enemies.draw 1
     pop temp 0
-    goto TDGame_66
-label TDGame_67
-label TDGame_66
+    goto TDGame_64
+label TDGame_65
+label TDGame_64
     push local 1
     push constant 1
     add
     pop local 1
-    goto TDGame_64
-label TDGame_65
+    goto TDGame_62
+label TDGame_63
     push this 0
     call Cursor.draw 1
     pop temp 0
@@ -1198,6 +1180,24 @@ label TDGame_65
     push pointer 0
     call TDGame.drawGrid 1
     pop temp 0
+    push this 0
+    call Cursor.getScore 1
+    push constant 30
+    gt
+    not
+    if-goto TDGame_67
+    push constant 20
+    push constant 0
+    call Output.moveCursor 2
+    pop temp 0
+    push this 13
+    call Output.printString 1
+    pop temp 0
+    call Sys.halt 0
+    pop temp 0
+    goto TDGame_66
+label TDGame_67
+label TDGame_66
     push this 7
     call Sys.wait 1
     pop temp 0

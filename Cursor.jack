@@ -123,6 +123,7 @@ class Cursor {
         return lastKey;
     }
 
+    //returns the array for objectInGrid so that TDGame can make use of it
     method Array getObjectInGrid() {
         return objectInGrid;
     }
@@ -440,7 +441,7 @@ class Cursor {
         let oldY = gridY;
         let key = Keyboard.keyPressed();
 
-        if (((key = 97) & ~(lastKey = 97)) | ((key = 130) & ~(lastKey = 130))) {        //a or left arrow
+        if (((key = 97) & ~(lastKey = 97)) | ((key = 130) & ~(lastKey = 130))) {          //a or left arrow
             if (gridX > 0) {
                 let gridX = gridX - 1;
             }
